@@ -237,7 +237,7 @@ export async function getInvestmentSummary() {
     fundsValue: number;
     metalCount: number;
     fundCount: number;
-  }>("/dashboard/investment");
+  }>("/dashboard/investments");
 }
 
 // ============= Dev Utility =============
