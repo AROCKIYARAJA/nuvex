@@ -11,8 +11,7 @@ export default function NotFoundPage() {
         404
       </h1>
       <p className="text-lg text-muted-foreground mb-6">
-        Page not found. The route you're looking for doesn't exist. Kindly check
-        the entered URL
+        Page not found. The route you're looking for doesn't exist.
       </p>
       <button
         onClick={() => navigate(ROUTES.CASHFLOW_DASHBOARD)}
