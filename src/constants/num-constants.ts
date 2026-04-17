@@ -1,0 +1,50 @@
+// All numeric constants used across the application
+export const NUM = {
+  // Toast durations (ms)
+  TOAST_DURATION: 3000,
+  TOAST_SUCCESS_DURATION: 2500,
+  TOAST_ERROR_DURATION: 4000,
+
+  // Animation durations (ms)
+  ANIMATION_FAST: 150,
+  ANIMATION_NORMAL: 300,
+  ANIMATION_SLOW: 500,
+
+  // Pagination
+  TRANSACTIONS_PER_PAGE: 10,
+  FUNDS_PER_PAGE: 8,
+
+  // Chart
+  CHART_DAYS_DAILY: 7,
+  CHART_DAYS_WEEKLY: 28,
+  CHART_DAYS_MONTHLY: 365,
+  CHART_BORDER_WIDTH: 2,
+  CHART_TENSION: 0.4,
+  CHART_POINT_RADIUS: 3,
+  CHART_POINT_HOVER_RADIUS: 6,
+
+  // Breakpoints
+  BREAKPOINT_SM: 640,
+  BREAKPOINT_MD: 768,
+  BREAKPOINT_LG: 1024,
+  BREAKPOINT_XL: 1280,
+
+  // Validation
+  MIN_AMOUNT: 0.01,
+  MAX_AMOUNT: 99999999,
+  MAX_NAME_LENGTH: 100,
+  MAX_NOTES_LENGTH: 500,
+
+  // Misc
+  REMINDER_HOUR: 21, // 9 PM
+  RECENT_ITEMS_COUNT: 5,
+  TOP_CATEGORIES_COUNT: 3,
+  DEBOUNCE_MS: 300,
+  SKELETON_COUNT: 4,
+
+  // Currency decimal places
+  DECIMAL_PLACES: 2,
+
+  // Profile
+  PROFILE_COMPLETION_FIELDS: 2,
+} as const;
