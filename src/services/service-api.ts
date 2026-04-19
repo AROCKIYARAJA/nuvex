@@ -184,6 +184,39 @@ export async function deleteMetal(id: string): Promise<void> {
   await request<void>(`/metals/${id}`, { method: "DELETE" });
 }
 
+// ============= Asset Withdraw =============
+export interface AssetWithdrawal {
+  id: string;
+  name: string;
+  quantity: number;
+  pricePerGram: number;
+  totalPrice: number;
+  assetType: "gold" | "silver";
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export async function withdrawAsset(data: {
+  name: string;
+  quantity: number;
+  pricePerGram: number;
+  totalPrice: number;
+  assetType: "gold" | "silver";
+  notes?: string;
+}): Promise<AssetWithdrawal> {
+  const created = await request<AssetWithdrawal>("/metals/withdraw", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+  return normalize(created);
+}
+
+export async function getAssetWithdrawals(): Promise<AssetWithdrawal[]> {
+  const data = await request<AssetWithdrawal[]>("/metals/withdrawals");
+  return normalizeList(data);
+}
+
 // ============= Mutual Funds =============
 export async function getMutualFunds(): Promise<MutualFund[]> {
   const data = await request<MutualFund[]>("/mutual-funds");
