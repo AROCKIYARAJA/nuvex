@@ -227,6 +227,40 @@ export async function getCashflowSummary() {
   }>("/dashboard/cashflow");
 }
 
+export interface TopSpendingItem {
+  category: string;
+  amount: number;
+}
+
+export async function getTopSpending(limit = 3): Promise<TopSpendingItem[]> {
+  const data = await request<TopSpendingItem[]>(
+    `/dashboard/top-spending?limit=${limit}`,
+  );
+  return Array.isArray(data) ? data : [];
+}
+
+export interface RecentTransaction {
+  id: string;
+  type: "income" | "expense";
+  name: string;
+  amount: number;
+  category: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export async function getRecentTransactions(
+  limit = 5,
+): Promise<RecentTransaction[]> {
+  const data = await request<any[]>(
+    `/dashboard/recent-transactions?limit=${limit}`,
+  );
+  return (Array.isArray(data) ? data : []).map((tx) => ({
+    ...tx,
+    id: tx.id || tx._id,
+  }));
+}
+
 export async function getInvestmentSummary() {
   return await request<{
     totalInvested: number;
