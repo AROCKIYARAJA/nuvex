@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { StatCard } from "@/components/common/StatCard";
 import { PageHeader } from "@/components/common/PageHeader";
+import { Modal } from "@/components/common/Modal";
 import { SkeletonCard } from "@/components/common/Skeletons";
-import { getInvestmentSummary, getMutualFunds, getMetals } from "@/services/service-api";
+import { getInvestmentSummary, addPFEntry, getPFTotal } from "@/services/service-api";
 import { formatCurrency, getGrowthPercent } from "@/utils/formatters";
 import { CURRENCIES, CHART_PERIODS } from "@/constants/app-constants";
 import { NUM } from "@/constants/num-constants";
@@ -23,17 +24,39 @@ export default function InvestmentDashboard() {
   const [summary, setSummary] = useState<any>(null);
   const [currency, setCurrency] = useState("INR");
   const [chartPeriod, setChartPeriod] = useState("monthly");
+  const [pfTotal, setPfTotal] = useState(0);
+
+  // PF modal state
+  const [pfOpen, setPfOpen] = useState(false);
+  const [pfForm, setPfForm] = useState({ name: "", amount: "", notes: "" });
+  const [pfSubmitting, setPfSubmitting] = useState(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const s = await getInvestmentSummary();
+      const [s, pf] = await Promise.all([getInvestmentSummary(), getPFTotal().catch(() => ({ totalAmount: 0 }))]);
       setSummary(s);
+      setPfTotal(pf.totalAmount || 0);
     } catch { toast.error("Failed to load data"); }
     finally { setLoading(false); }
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);
+
+  const handleAddPF = async () => {
+    const amt = parseFloat(pfForm.amount);
+    if (!pfForm.name.trim()) { toast.error("Enter a name"); return; }
+    if (!amt || amt < NUM.MIN_AMOUNT) { toast.error("Enter a valid amount"); return; }
+    setPfSubmitting(true);
+    try {
+      await addPFEntry({ name: pfForm.name.trim(), amount: amt, notes: pfForm.notes.trim() });
+      toast.success("PF amount added!", { duration: NUM.TOAST_DURATION });
+      setPfOpen(false);
+      setPfForm({ name: "", amount: "", notes: "" });
+      loadData();
+    } catch { toast.error("Failed to add PF"); }
+    finally { setPfSubmitting(false); }
+  };
 
   const growth = summary ? getGrowthPercent(summary.totalInvested, summary.totalValue) : 0;
 
@@ -63,7 +86,7 @@ export default function InvestmentDashboard() {
     return (
       <div className="space-y-6">
         <PageHeader title="Investments" subtitle="Loading..." />
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">{Array.from({ length: NUM.SKELETON_COUNT }).map((_, i) => <SkeletonCard key={i} />)}</div>
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">{Array.from({ length: 5 }).map((_, i) => <SkeletonCard key={i} />)}</div>
       </div>
     );
   }
@@ -74,7 +97,7 @@ export default function InvestmentDashboard() {
         title="Investments"
         subtitle="Track your portfolio performance"
         action={
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <select value={currency} onChange={(e) => setCurrency(e.target.value)} className="text-sm bg-secondary text-secondary-foreground rounded-lg px-3 py-1.5 border border-border focus:outline-none focus:ring-1 focus:ring-ring">
               {CURRENCIES.map((c) => <option key={c.code} value={c.code}>{c.code}</option>)}
             </select>
@@ -84,15 +107,19 @@ export default function InvestmentDashboard() {
             <button onClick={() => navigate(ROUTES.INVESTMENTS_FUNDS)} className="gradient-primary text-primary-foreground text-sm font-medium px-4 py-1.5 rounded-lg hover:opacity-90 transition-opacity flex items-center gap-1.5">
               <i className="bx bx-bar-chart-alt-2" /> Funds
             </button>
+            <button onClick={() => setPfOpen(true)} className="bg-muted-foreground text-background text-sm font-medium px-4 py-1.5 rounded-lg hover:opacity-90 transition-opacity flex items-center gap-1.5">
+              <i className="bx bx-shield-quarter" /> Add PF
+            </button>
           </div>
         }
       />
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <StatCard title="Total Invested" value={formatCurrency(summary?.totalInvested || 0, currency)} icon="bx-coin-stack" variant="primary" />
         <StatCard title="Current Value" value={formatCurrency(summary?.totalValue || 0, currency)} icon="bx-line-chart" variant="success" />
         <StatCard title="Est. Returns" value={formatCurrency(summary?.estimatedReturns || 0, currency)} icon="bx-trending-up" variant={summary?.estimatedReturns >= 0 ? "success" : "destructive"} trend={summary?.estimatedReturns >= 0 ? "up" : "down"} trendValue={`${growth}%`} />
         <StatCard title="Assets" value={`${summary?.metalCount + summary?.fundCount}`} icon="bx-category" subtitle={`${summary?.metalCount} metals · ${summary?.fundCount} funds`} />
+        <StatCard title="PF Amount" value={formatCurrency(pfTotal, currency)} icon="bx-shield-quarter" variant="warning" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -120,7 +147,6 @@ export default function InvestmentDashboard() {
         </div>
       </div>
 
-      {/* Quick actions */}
       <div className="bg-card border border-border rounded-xl p-4 shadow-card">
         <h3 className="font-display font-semibold text-foreground mb-3">Quick Actions</h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -136,6 +162,31 @@ export default function InvestmentDashboard() {
           ))}
         </div>
       </div>
+
+      {/* PF Modal */}
+      <Modal open={pfOpen} onClose={() => setPfOpen(false)} title="Add PF Amount">
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1.5">Name *</label>
+            <input type="text" value={pfForm.name} onChange={(e) => setPfForm({ ...pfForm, name: e.target.value })} placeholder="e.g. April PF"
+              className="w-full px-3 py-2.5 rounded-lg bg-secondary border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1.5">Amount (₹) *</label>
+            <input type="number" value={pfForm.amount} onChange={(e) => setPfForm({ ...pfForm, amount: e.target.value })} placeholder="0.00" step="0.01"
+              className="w-full px-3 py-2.5 rounded-lg bg-secondary border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1.5">Notes</label>
+            <textarea value={pfForm.notes} onChange={(e) => setPfForm({ ...pfForm, notes: e.target.value })} placeholder="Optional notes" rows={2}
+              className="w-full px-3 py-2.5 rounded-lg bg-secondary border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground resize-none" />
+          </div>
+          <button onClick={handleAddPF} disabled={pfSubmitting}
+            className="w-full bg-muted-foreground text-background font-medium py-3 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2">
+            {pfSubmitting ? <><i className="bx bx-loader-alt bx-spin" /> Adding...</> : <><i className="bx bx-shield-quarter" /> Add PF Amount</>}
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 }

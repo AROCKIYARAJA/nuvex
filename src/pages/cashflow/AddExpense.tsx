@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/common/PageHeader";
@@ -16,6 +16,13 @@ export default function AddExpense() {
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [categorySearch, setCategorySearch] = useState("");
+
+  const filteredCategories = useMemo(() => {
+    if (!categorySearch.trim()) return EXPENSE_CATEGORIES;
+    const q = categorySearch.toLowerCase();
+    return EXPENSE_CATEGORIES.filter((cat) => cat.label.toLowerCase().includes(q));
+  }, [categorySearch]);
 
   const validate = () => {
     const errs: Record<string, string> = {};
@@ -38,7 +45,7 @@ export default function AddExpense() {
       await addExpense({ name: name.trim(), amount: parseFloat(amount), category, notes: notes.trim() });
       toast.success("Expense added successfully!", { duration: NUM.TOAST_SUCCESS_DURATION });
       setTimeout(() => toast.info("Dashboard balance updated", { duration: NUM.TOAST_DURATION }), 500);
-      setName(""); setAmount(""); setCategory(""); setNotes("");
+      setName(""); setAmount(""); setCategory(""); setNotes(""); setCategorySearch("");
       setErrors({});
     } catch {
       toast.error("Failed to add expense", { duration: NUM.TOAST_ERROR_DURATION });
@@ -74,8 +81,15 @@ export default function AddExpense() {
         {/* Category */}
         <div>
           <label className="block text-sm font-medium text-foreground mb-2">Category *</label>
+          <input
+            type="text"
+            value={categorySearch}
+            onChange={(e) => setCategorySearch(e.target.value)}
+            placeholder="Search Category"
+            className="w-full px-3 py-2 rounded-lg bg-secondary border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground mb-2"
+          />
           <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 max-h-64 overflow-y-auto scrollbar-thin pr-1">
-            {EXPENSE_CATEGORIES.map((cat) => (
+            {filteredCategories.map((cat) => (
               <button type="button" key={cat.id} onClick={() => setCategory(cat.id)}
                 className={cn("flex flex-col items-center gap-1.5 p-3 rounded-xl border text-xs font-medium transition-all",
                   category === cat.id ? "border-primary bg-accent text-primary shadow-card" : "border-border bg-secondary text-muted-foreground hover:border-primary/30 hover:text-foreground"
@@ -84,6 +98,9 @@ export default function AddExpense() {
                 <span className="text-center leading-tight">{cat.label}</span>
               </button>
             ))}
+            {filteredCategories.length === 0 && (
+              <p className="col-span-full text-center text-xs text-muted-foreground py-4">No categories found</p>
+            )}
           </div>
           {errors.category && <p className="text-xs text-destructive mt-1">{errors.category}</p>}
         </div>

@@ -13,6 +13,7 @@ import InvestmentDashboard from "@/pages/investments/InvestmentDashboard";
 import BullionVault from "@/pages/investments/BullionVault";
 import MutualFunds from "@/pages/investments/MutualFunds";
 import AddFund from "@/pages/investments/AddFund";
+import OverallNetworth from "@/pages/networth/OverallNetworth";
 import Profile from "@/pages/profile/Profile";
 import NotFoundPage from "@/pages/errors/NotFoundPage";
 
@@ -34,6 +35,7 @@ const App = () => (
               <Route path={ROUTES.INVESTMENTS_METALS} element={<BullionVault />} />
               <Route path={ROUTES.INVESTMENTS_FUNDS} element={<MutualFunds />} />
               <Route path={ROUTES.INVESTMENTS_FUNDS_NEW} element={<AddFund />} />
+              <Route path={ROUTES.NETWORTH} element={<OverallNetworth />} />
               <Route path={ROUTES.PROFILE} element={<Profile />} />
             </Route>
             <Route path="*" element={<NotFoundPage />} />

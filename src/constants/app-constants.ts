@@ -48,6 +48,7 @@ export const EXPENSE_CATEGORIES = [
   { id: "charity", label: "Charity", icon: "bx-heart" },
   { id: "personal_care", label: "Personal Care", icon: "bx-spa" },
   { id: "electronics", label: "Electronics", icon: "bx-chip" },
+  { id: "others", label: "Others", icon: "bx-dots-horizontal-rounded" },
 ] as const;
 
 export const INCOME_CATEGORIES = [
@@ -105,4 +106,5 @@ export const DB_KEY = "nuvex_db";
 
 // Backend API base URL — override via VITE_API_BASE_URL in .env
 export const API_BASE_URL =
+  (import.meta as any).env?.VITE_API_BASE_URL ||
   "https://nuvex-finance-tracker-backend.vercel.app/api";

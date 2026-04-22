@@ -7,5 +7,6 @@ export const ROUTES = {
   INVESTMENTS_METALS: "/investments/metals",
   INVESTMENTS_FUNDS: "/investments/funds",
   INVESTMENTS_FUNDS_NEW: "/investments/funds/new",
+  NETWORTH: "/networth/overall",
   PROFILE: "/profile",
 } as const;
