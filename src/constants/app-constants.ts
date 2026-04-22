@@ -106,4 +106,4 @@ export const DB_KEY = "nuvex_db";
 // Backend API base URL — override via VITE_API_BASE_URL in .env
 export const API_BASE_URL =
   (import.meta as any).env?.VITE_API_BASE_URL ||
-  "https://nuvex-finance-tracker-backend-production.up.railway.app/api";
+  "https://nuvex-finance-tracker-backend.vercel.app/api";
