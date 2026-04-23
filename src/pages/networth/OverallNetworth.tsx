@@ -91,7 +91,7 @@ export default function OverallNetworth() {
       />
 
       {entries.length > 0 ? (
-        <div className="bg-card border border-border rounded-xl shadow-card overflow-x-auto">
+        <div className="bg-card border border-border rounded-xl shadow-card overflow-x-auto scroll-custom-css">
           <table className="w-full text-sm min-w-[1300px]">
             <thead>
               <tr className="border-b border-border bg-secondary/50">
