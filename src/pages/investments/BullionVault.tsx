@@ -299,12 +299,13 @@ export default function BullionVault() {
           </div>
         }
       />
+
       <div className="grid grid-cols-1">
         <StatCard
           title="Gold + Silver Total Amount"
           value={formatCurrency(totalGoldVal + totalSilverVal)}
           icon="bx-coin"
-          variant="warning"
+          variant="success"
           subtitle={""}
         />
       </div>
