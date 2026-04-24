@@ -11,6 +11,13 @@ export function formatCurrency(amount: number, currencyCode = "INR"): string {
   return amount < 0 ? `-${symbol}${formatted}` : `${symbol}${formatted}`;
 }
 
+export function valComparion(val1: number, val2: number): string {
+    if (val1 === val2) return "";
+    if (val1 < val2) return "text-destructive";
+    if (val1 > val2 && val2 !== 0) return "text-success";
+    if (val1 > val2 && val2 === 0) return "";
+  }
+
 export function formatCompact(amount: number): string {
   if (Math.abs(amount) >= 10000000) return `${(amount / 10000000).toFixed(1)}Cr`;
   if (Math.abs(amount) >= 100000) return `${(amount / 100000).toFixed(1)}L`;

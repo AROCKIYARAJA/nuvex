@@ -9,7 +9,7 @@ import {
   getNetworthSnapshot,
   type NetworthEntry,
 } from "@/services/service-api";
-import { formatCurrency, formatDate } from "@/utils/formatters";
+import { formatCurrency, formatDate, valComparion } from "@/utils/formatters";
 import { NUM } from "@/constants/num-constants";
 import { cn } from "@/lib/utils";
 
@@ -262,7 +262,9 @@ export default function OverallNetworth() {
                   <td className="px-2 py-2 text-center text-xs border-l border-border">
                     {formatCurrency(entry.pfAmount ?? 0)}
                   </td>
-                  <td className="px-2 py-2 text-center text-xs font-bold text-success border-l border-border">
+                  <td
+                    className={`px-2 py-2 text-center text-xs font-bold border-l border-border ${valComparion(entries[idx].networth, entries[idx + 1]?.networth || 0)}`}
+                  >
                     {formatCurrency(entry.networth ?? 0)}
                   </td>
                   <td
