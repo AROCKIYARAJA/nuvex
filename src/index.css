@@ -165,28 +165,37 @@
   }
 }
 
-body,.scroll-custom-css {
+body,
+.scroll-custom-css {
   --sb-track-color: #232e33;
   --sb-thumb-color: #007bff;
   --sb-size: 5px;
 }
 
-body::-webkit-scrollbar,.scroll-custom-css::-webkit-scrollbar {
+.scroll-custom-css {
+  --sb-track-color: #232e3300;
+  --sb-thumb-color: #007bff00;
+  --sb-size: 0px;
+}
+
+body::-webkit-scrollbar,
+.scroll-custom-css::-webkit-scrollbar {
   width: var(--sb-size);
 }
 
-body::-webkit-scrollbar-track, .scroll-custom-css::-webkit-scrollbar-track {
+body::-webkit-scrollbar-track {
   background: var(--sb-track-color);
   border-radius: 5px;
 }
 
-body::-webkit-scrollbar-thumb, .scroll-custom-css::-webkit-scrollbar-thumb {
+body::-webkit-scrollbar-thumb {
   background: var(--sb-thumb-color);
   border-radius: 5px;
 }
 
 @supports not selector(::-webkit-scrollbar) {
-  body, .scroll-custom-css {
+  body,
+  .scroll-custom-css {
     scrollbar-color: var(--sb-thumb-color) var(--sb-track-color);
   }
 }
