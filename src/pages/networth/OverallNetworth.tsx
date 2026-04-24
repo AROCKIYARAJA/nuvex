@@ -268,13 +268,19 @@ export default function OverallNetworth() {
                   <td
                     className={cn(
                       "px-2 py-2 text-center text-xs font-semibold border-l border-border",
-                      (entry.growth ?? 0) >= 0
-                        ? "text-success"
-                        : "text-destructive",
+                      (entries[idx].networth - entries[idx + 1]?.networth || 0)
+                        .toString()
+                        .includes("-")
+                        ? "text-destructive"
+                        : (entries[idx].networth - entries[idx + 1]?.networth ||
+                              0) === 0
+                          ? ""
+                          : "text-success",
                     )}
                   >
-                    {(entry.growth ?? 0) >= 0 ? "+" : ""}
-                    {formatCurrency(entry.growth ?? 0)}
+                    {formatCurrency(
+                      entries[idx].networth - entries[idx + 1]?.networth || 0,
+                    )}
                   </td>
                 </tr>
               ))}
