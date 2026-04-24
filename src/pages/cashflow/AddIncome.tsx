@@ -43,6 +43,7 @@ export default function AddIncome() {
     } catch {
       toast.error("Failed to add income", { duration: NUM.TOAST_ERROR_DURATION });
     } finally {
+      navigate(ROUTES.CASHFLOW_DASHBOARD)
       setLoading(false);
     }
   };

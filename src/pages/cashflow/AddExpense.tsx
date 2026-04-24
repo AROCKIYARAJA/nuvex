@@ -50,6 +50,7 @@ export default function AddExpense() {
     } catch {
       toast.error("Failed to add expense", { duration: NUM.TOAST_ERROR_DURATION });
     } finally {
+      navigate(ROUTES.CASHFLOW_DASHBOARD)
       setLoading(false);
     }
   };
