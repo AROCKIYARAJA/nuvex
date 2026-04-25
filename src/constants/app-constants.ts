@@ -107,5 +107,5 @@ export const DB_KEY = "nuvex_db";
 // Backend API base URL — override via VITE_API_BASE_URL in .env
 export const API_BASE_URL =
   localStorage.getItem("nuvex-user-mode") === import.meta.env.VITE_ADMIN
-    ? "https://nuvex-finance-tracker-backend.vercel.app/api"
-    : "https://nuvex-finance-tracker-backend-guest.vercel.app/api";
+    ? import.meta.env.VITE_ADMINAPI
+    : import.meta.env.VITE_GUESTAPI;
