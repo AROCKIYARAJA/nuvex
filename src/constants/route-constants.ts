@@ -1,5 +1,6 @@
 export const ROUTES = {
   HOME: "/",
+  LOGIN: "/login",
   CASHFLOW_DASHBOARD: "/cashflow/dashboard",
   CASHFLOW_ADD_EXPENSE: "/cashflow/add-expense",
   CASHFLOW_ADD_INCOME: "/cashflow/add-income",

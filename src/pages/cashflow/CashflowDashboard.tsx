@@ -253,17 +253,17 @@ export default function CashflowDashboard() {
             </select>
             <button
               onClick={() => navigate(ROUTES.CASHFLOW_ADD_EXPENSE)}
-              className="gradient-primary text-primary-foreground text-sm font-medium px-4 py-1.5 rounded-lg hover:opacity-90 transition-opacity flex items-center gap-1.5"
+              className="bg-red-600 text-primary-foreground text-sm font-medium px-4 py-1.5 rounded-lg hover:opacity-90 transition-opacity flex items-center gap-1.5"
             >
               <i className="bx bx-plus" />
-              <span className="hidden sm:inline">Expense</span>
+              <span className="">Expense</span>
             </button>
             <button
               onClick={() => navigate(ROUTES.CASHFLOW_ADD_INCOME)}
               className="bg-success text-success-foreground text-sm font-medium px-4 py-1.5 rounded-lg hover:opacity-90 transition-opacity flex items-center gap-1.5"
             >
               <i className="bx bx-plus" />
-              <span className="hidden sm:inline">Income</span>
+              <span className="">Income</span>
             </button>
           </div>
         }

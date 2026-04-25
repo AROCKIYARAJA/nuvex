@@ -15,7 +15,14 @@ import MutualFunds from "@/pages/investments/MutualFunds";
 import AddFund from "@/pages/investments/AddFund";
 import OverallNetworth from "@/pages/networth/OverallNetworth";
 import Profile from "@/pages/profile/Profile";
+import Login from "@/pages/auth/Login";
 import NotFoundPage from "@/pages/errors/NotFoundPage";
+
+const USER_KEY = "nuvex-user-mode";
+const RequireAuth = ({ children }: { children: JSX.Element }) => {
+  const user = typeof window !== "undefined" ? localStorage.getItem(USER_KEY) : null;
+  return user ? children : <Navigate to={ROUTES.LOGIN} replace />;
+};
 
 const queryClient = new QueryClient();
 
@@ -27,7 +34,8 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path={ROUTES.HOME} element={<Navigate to={ROUTES.CASHFLOW_DASHBOARD} replace />} />
-            <Route element={<AppLayout />}>
+            <Route path={ROUTES.LOGIN} element={<Login />} />
+            <Route element={<RequireAuth><AppLayout /></RequireAuth>}>
               <Route path={ROUTES.CASHFLOW_DASHBOARD} element={<CashflowDashboard />} />
               <Route path={ROUTES.CASHFLOW_ADD_EXPENSE} element={<AddExpense />} />
               <Route path={ROUTES.CASHFLOW_ADD_INCOME} element={<AddIncome />} />
