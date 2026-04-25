@@ -106,6 +106,7 @@ export const DB_KEY = "nuvex_db";
 
 // Backend API base URL — override via VITE_API_BASE_URL in .env
 export const API_BASE_URL =
-  localStorage.getItem("nuvex-user-mode") === import.meta.env.VITE_ADMIN
+  localStorage.getItem(import.meta.env.VITE_LS_TOKEN) ===
+  import.meta.env.VITE_ADMIN
     ? import.meta.env.VITE_ADMINAPI
     : import.meta.env.VITE_GUESTAPI;
