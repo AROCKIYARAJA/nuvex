@@ -298,6 +298,10 @@ export async function getNetworthSnapshot(): Promise<Omit<NetworthEntry, "id" | 
   return await request<Omit<NetworthEntry, "id" | "createdAt">>("/networth/snapshot");
 }
 
+export async function deleteNetworthEntry(id: string): Promise<void> {
+  await request<void>(`/networth/${id}`, { method: "DELETE" });
+}
+
 // ============= Dev Utility =============
 export async function resetDB() {
   return await request<any>("/reset-all/delete-all");

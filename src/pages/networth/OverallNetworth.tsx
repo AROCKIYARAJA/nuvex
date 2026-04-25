@@ -7,16 +7,29 @@ import {
   getNetworthEntries,
   addNetworthEntry,
   getNetworthSnapshot,
+  deleteNetworthEntry,
   type NetworthEntry,
 } from "@/services/service-api";
 import { formatCurrency, formatDate, valComparion } from "@/utils/formatters";
 import { NUM } from "@/constants/num-constants";
 import { cn } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function OverallNetworth() {
   const [loading, setLoading] = useState(true);
   const [entries, setEntries] = useState<NetworthEntry[]>([]);
   const [adding, setAdding] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState<NetworthEntry | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -46,6 +59,23 @@ export default function OverallNetworth() {
       toast.error(e?.message || "Failed to add today's status");
     } finally {
       setAdding(false);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!pendingDelete) return;
+    setDeleting(true);
+    try {
+      await deleteNetworthEntry(pendingDelete.id);
+      toast.success("Networth entry deleted", {
+        duration: NUM.TOAST_SUCCESS_DURATION,
+      });
+      setPendingDelete(null);
+      await loadData();
+    } catch (e: any) {
+      toast.error(e?.message || "Failed to delete entry");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -202,7 +232,18 @@ export default function OverallNetworth() {
                   )}
                 >
                   <td className="px-3 py-2.5 text-xs font-medium text-foreground sticky left-0 bg-card z-10">
-                    {formatDate(entry.date || entry.createdAt)}
+                    <div className="flex items-center justify-between gap-2">
+                      <span>{formatDate(entry.date || entry.createdAt)}</span>
+                      <button
+                        type="button"
+                        onClick={() => setPendingDelete(entry)}
+                        className="text-muted-foreground hover:text-destructive transition-colors p-1 rounded hover:bg-destructive/10"
+                        aria-label="Delete networth entry"
+                        title="Delete entry"
+                      >
+                        <i className="bx bx-trash text-sm" />
+                      </button>
+                    </div>
                   </td>
                   <td className="px-2 py-2 text-center text-xs border-l border-border">
                     {entry.metals?.gold?.grams ?? 0}g
@@ -296,6 +337,45 @@ export default function OverallNetworth() {
           description="Click 'Add Today Status' to capture your first snapshot"
         />
       )}
+
+      <AlertDialog
+        open={!!pendingDelete}
+        onOpenChange={(open) => !open && !deleting && setPendingDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete networth entry?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently remove the snapshot from{" "}
+              <span className="font-medium text-foreground">
+                {pendingDelete
+                  ? formatDate(pendingDelete.date || pendingDelete.createdAt)
+                  : ""}
+              </span>
+              . This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                handleConfirmDelete();
+              }}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? (
+                <>
+                  <i className="bx bx-loader-alt bx-spin mr-1.5" /> Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
