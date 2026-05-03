@@ -24,6 +24,15 @@ export const CURRENCIES = [
   { code: "CNY", symbol: "¥", name: "Chinese Yuan" },
 ] as const;
 
+export const TRANSACTIONS_PER_PAGE = [
+  { code: 5, name: 5 },
+  { code: 10, name: 10 },
+  { code: 20, name: 20 },
+  { code: 30, name: 30 },
+  { code: 40, name: 40 },
+  { code: 50, name: 50 },
+] as const;
+
 export const EXPENSE_CATEGORIES = [
   { id: "food", label: "Food", icon: "bx-bowl-rice" },
   { id: "vegetables", label: "Vegetables & Fruits", icon: "bx-leaf" },
@@ -39,12 +48,11 @@ export const EXPENSE_CATEGORIES = [
   { id: "bills", label: "Bills", icon: "bx-receipt" },
   { id: "fuel", label: "Fuel", icon: "bx-gas-pump" },
   { id: "study", label: "Study", icon: "bx-book" },
-  { id: "lend", label: "Lend", icon: "bx-hand" },
-  { id: "rent", label: "Rent", icon: "bx-home" },
+  { id: "lend", label: "Lend", icon: "bx-dots-horizontal-rounded" },
+  { id: "rent", label: "Rent", icon: "bx-building-house" },
   { id: "emi", label: "EMI", icon: "bx-credit-card" },
   { id: "gifts", label: "Gifts", icon: "bx-gift" },
   { id: "family", label: "Family", icon: "bx-group" },
-  { id: "pets", label: "Pets", icon: "bx-dog" },
   { id: "maintenance", label: "Maintenance", icon: "bx-wrench" },
   { id: "insurance", label: "Insurance", icon: "bx-shield" },
   { id: "charity", label: "Charity", icon: "bx-heart" },

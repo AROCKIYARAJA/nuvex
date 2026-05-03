@@ -28,6 +28,7 @@ import {
   CURRENCIES,
   CHART_PERIODS,
   HEALTH_STATUSES,
+  TRANSACTIONS_PER_PAGE,
 } from "@/constants/app-constants";
 import { NUM } from "@/constants/num-constants";
 import { ROUTES } from "@/constants/route-constants";
@@ -45,6 +46,7 @@ import {
 } from "chart.js";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/hooks/use-theme";
+import { Slice } from "lucide-react";
 
 ChartJS.register(
   CategoryScale,
@@ -65,8 +67,9 @@ export default function CashflowDashboard() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [incomes, setIncomes] = useState<Income[]>([]);
   const [topSpending, setTopSpending] = useState<TopSpendingItem[]>([]);
-  const [recent, setRecent] = useState<RecentTransaction[]>([]);
   const [currency, setCurrency] = useState("INR");
+  const [transLimit, setTransLimit] = useState(5);
+  const [recentTransactions, setRecentTransactions] = useState([]);
   const [chartPeriod, setChartPeriod] = useState("monthly");
 
   const loadData = useCallback(async () => {
@@ -79,7 +82,7 @@ export default function CashflowDashboard() {
         getTopSpending(NUM.TOP_CATEGORIES_COUNT).catch(
           () => [] as TopSpendingItem[],
         ),
-        getRecentTransactions(NUM.RECENT_ITEMS_COUNT).catch(
+        getRecentTransactions(transLimit).catch(
           () => [] as RecentTransaction[],
         ),
       ]);
@@ -87,7 +90,7 @@ export default function CashflowDashboard() {
       setExpenses(e);
       setIncomes(i);
       setTopSpending(top);
-      setRecent(rec);
+      renderTransaction(transLimit, e, i);
     } catch {
       toast.error("Failed to load data");
     } finally {
@@ -120,18 +123,19 @@ export default function CashflowDashboard() {
       .map(([cat, amount]) => ({ category: cat, amount }));
   };
 
-  const recentTransactions =
-    recent && recent.length > 0
-      ? recent
-      : [
-          ...expenses.map((e) => ({ ...e, type: "expense" as const })),
-          ...incomes.map((i) => ({ ...i, type: "income" as const })),
-        ]
-          .sort(
-            (a, b) =>
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-          )
-          .slice(0, NUM.RECENT_ITEMS_COUNT);
+  function renderTransaction(transLimit: number, e: Expense[], i: Income[]) {
+    setTransLimit(transLimit);
+    const records = [
+      ...e.map((e) => ({ ...e, type: "expense" as const })),
+      ...i.map((i) => ({ ...i, type: "income" as const })),
+    ]
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      )
+      .slice(0, transLimit);
+    setRecentTransactions(records);
+  }
 
   const health = getHealthStatus();
   const topCats = getTopCategories();
@@ -403,12 +407,25 @@ export default function CashflowDashboard() {
 
       {/* Recent Transactions */}
       <div className="bg-card border border-border rounded-xl shadow-card">
-        <div className="p-4 border-b border-border">
+        <div className="p-4 border-b border-border flex justify-between">
           <h3 className="font-display font-semibold text-foreground">
             Recent Transactions
           </h3>
+          <select
+            value={transLimit}
+            onChange={(e) =>
+              renderTransaction(Number(e.target.value), expenses, incomes)
+            }
+            className="text-sm bg-secondary text-secondary-foreground rounded-lg px-3 py-1.5 border border-border focus:outline-none focus:ring-1 focus:ring-ring"
+          >
+            {TRANSACTIONS_PER_PAGE.map((c) => (
+              <option key={c.code} value={c.code}>
+                {c.code}
+              </option>
+            ))}
+          </select>
         </div>
-        {recentTransactions.length > 0 ? (
+        {recentTransactions?.length > 0 ? (
           <div className="divide-y divide-border">
             {recentTransactions.map((tx) => {
               const cats =
