@@ -171,10 +171,11 @@ export default function Profile() {
             </label>
             <input
               type="email"
+              disabled
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
               placeholder="you@email.com"
-              className="w-full px-3 py-2.5 rounded-lg bg-secondary border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              className="w-full px-3 py-2.5 rounded-lg bg-secondary border border-border text-foreground text-sm opacity-70 cursor-not-allowed"
             />
             {errors.email && (
               <p className="text-xs text-destructive mt-1">{errors.email}</p>
