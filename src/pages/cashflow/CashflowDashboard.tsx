@@ -408,7 +408,7 @@ export default function CashflowDashboard() {
           >
             {TRANSACTIONS_PER_PAGE.map((c) => (
               <option key={c.code} value={c.code}>
-                {c.code}
+                {c.name}
               </option>
             ))}
           </select>
