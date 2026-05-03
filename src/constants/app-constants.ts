@@ -25,12 +25,12 @@ export const CURRENCIES = [
 ] as const;
 
 export const TRANSACTIONS_PER_PAGE = [
-  { code: 5, name: 5 },
-  { code: 10, name: 10 },
-  { code: 20, name: 20 },
-  { code: 30, name: 30 },
-  { code: 40, name: 40 },
-  { code: 50, name: 50 },
+  { code: 5, name: "Show last 5 Transactions" },
+  { code: 10, name: "Show last 10 Transactions" },
+  { code: 20, name: "Show last 20 Transactions" },
+  { code: 30, name: "Show last 30 Transactions" },
+  { code: 40, name: "Show last 40 Transactions" },
+  { code: 50, name: "Show last 50 Transactions" },
 ] as const;
 
 export const EXPENSE_CATEGORIES = [
