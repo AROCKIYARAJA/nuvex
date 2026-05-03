@@ -25,7 +25,6 @@ import {
 import {
   EXPENSE_CATEGORIES,
   INCOME_CATEGORIES,
-  CURRENCIES,
   CHART_PERIODS,
   HEALTH_STATUSES,
   TRANSACTIONS_PER_PAGE,
@@ -244,17 +243,6 @@ export default function CashflowDashboard() {
         subtitle="Track your income, expenses, and financial health"
         action={
           <div className="flex items-center gap-2">
-            <select
-              value={currency}
-              onChange={(e) => setCurrency(e.target.value)}
-              className="text-sm bg-secondary text-secondary-foreground rounded-lg px-3 py-1.5 border border-border focus:outline-none focus:ring-1 focus:ring-ring"
-            >
-              {CURRENCIES.map((c) => (
-                <option key={c.code} value={c.code}>
-                  {c.code}
-                </option>
-              ))}
-            </select>
             <button
               onClick={() => navigate(ROUTES.CASHFLOW_ADD_EXPENSE)}
               className="bg-red-600 text-primary-foreground text-sm font-medium px-4 py-1.5 rounded-lg hover:opacity-90 transition-opacity flex items-center gap-1.5"
