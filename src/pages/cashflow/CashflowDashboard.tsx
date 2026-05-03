@@ -287,7 +287,7 @@ export default function CashflowDashboard() {
             "bg-destructive/10 text-destructive border-destructive/20",
         )}
       >
-        <i className="bx bx-pulse" />
+        <i className="bx bx-pulse bx-flashing" />
         Month Health: {health.label}
       </div>
 

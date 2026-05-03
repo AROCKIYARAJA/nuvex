@@ -28,7 +28,9 @@ export default function OverallNetworth() {
   const [loading, setLoading] = useState(true);
   const [entries, setEntries] = useState<NetworthEntry[]>([]);
   const [adding, setAdding] = useState(false);
-  const [pendingDelete, setPendingDelete] = useState<NetworthEntry | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<NetworthEntry | null>(
+    null,
+  );
   const [deleting, setDeleting] = useState(false);
 
   const loadData = useCallback(async () => {
@@ -119,6 +121,35 @@ export default function OverallNetworth() {
           </button>
         }
       />
+      {entries.length > 2 ? (
+        <div
+          className={`w-fit flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border ${
+            formatCurrency(
+              entries?.[0].networth - entries?.[1].networth,
+            ).includes("-")
+              ? "destructive bg-destructive/10 text-destructive border-destructive/20"
+              : formatCurrency(
+                    entries?.[0].networth - entries?.[1].networth,
+                  ).includes("₹0.00")
+                ? "warning bg-warning/10 text-warning border-warning/20"
+                : "success bg-success/10 text-success border-success/20"
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            <i className="bx bx-pulse bx-flashing" />
+            Daily Health: &nbsp;
+            {formatCurrency(entries?.[0].networth - entries?.[1].networth)}
+          </div> &nbsp;
+          |
+          <div className="flex items-center gap-2">
+            <i className="bx bx-info-circle" />
+            Summary Information: {(entries?.[0].networth - entries?.[1].networth) === 0 ? 'No Growth': 
+            (entries?.[0].networth - entries?.[1].networth) > 0 ? 'Networth Increased' : 'Networth Decreased' }
+          </div>
+        </div>
+      ) : (
+        ""
+      )}
 
       {entries.length > 0 ? (
         <div className="bg-card border border-border rounded-xl shadow-card overflow-x-auto scroll-custom-css">
