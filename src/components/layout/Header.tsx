@@ -11,25 +11,53 @@ const NAV_MODULES = [
     label: "Cashflow",
     icon: "bx-wallet",
     children: [
-      { label: "Dashboard", path: ROUTES.CASHFLOW_DASHBOARD, icon: "bx-grid-alt" },
-      { label: "Add Expense", path: ROUTES.CASHFLOW_ADD_EXPENSE, icon: "bx-minus-circle" },
-      { label: "Add Income", path: ROUTES.CASHFLOW_ADD_INCOME, icon: "bx-plus-circle" },
+      {
+        label: "Dashboard - Alt + 1",
+        path: ROUTES.CASHFLOW_DASHBOARD,
+        icon: "bx-grid-alt",
+      },
+      {
+        label: "Add Expense - Alt + 2",
+        path: ROUTES.CASHFLOW_ADD_EXPENSE,
+        icon: "bx-minus-circle",
+      },
+      {
+        label: "Add Income - Alt + 3",
+        path: ROUTES.CASHFLOW_ADD_INCOME,
+        icon: "bx-plus-circle",
+      },
     ],
   },
   {
     label: "Investments",
     icon: "bx-line-chart",
     children: [
-      { label: "Dashboard", path: ROUTES.INVESTMENTS_DASHBOARD, icon: "bx-grid-alt" },
-      { label: "Bullion Vault", path: ROUTES.INVESTMENTS_METALS, icon: "bx-coin" },
-      { label: "Mutual Funds", path: ROUTES.INVESTMENTS_FUNDS, icon: "bx-bar-chart-alt-2" },
+      {
+        label: "Dashboard - Alt + 4",
+        path: ROUTES.INVESTMENTS_DASHBOARD,
+        icon: "bx-grid-alt",
+      },
+      {
+        label: "Bullion Vault - Alt + 5",
+        path: ROUTES.INVESTMENTS_METALS,
+        icon: "bx-coin",
+      },
+      {
+        label: "Mutual Funds - Alt + 6",
+        path: ROUTES.INVESTMENTS_FUNDS,
+        icon: "bx-bar-chart-alt-2",
+      },
     ],
   },
   {
     label: "Networth Tracker",
     icon: "bx-trophy",
     children: [
-      { label: "Overall Networth", path: ROUTES.NETWORTH, icon: "bx-line-chart-down" },
+      {
+        label: "Overall Networth - Alt + 7",
+        path: ROUTES.NETWORTH,
+        icon: "bx-line-chart-down",
+      },
     ],
   },
 ];
@@ -52,8 +80,10 @@ export function Header() {
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (navRef.current && !navRef.current.contains(e.target as Node)) setNavOpen(false);
-      if (themeRef.current && !themeRef.current.contains(e.target as Node)) setThemeOpen(false);
+      if (navRef.current && !navRef.current.contains(e.target as Node))
+        setNavOpen(false);
+      if (themeRef.current && !themeRef.current.contains(e.target as Node))
+        setThemeOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -63,16 +93,22 @@ export function Header() {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
-  const currentThemeIcon = THEME_OPTIONS.find((t) => t.value === theme)?.icon || "bx-moon";
+  const currentThemeIcon =
+    THEME_OPTIONS.find((t) => t.value === theme)?.icon || "bx-moon";
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border glass">
       <div className="container flex items-center justify-between h-14 px-4">
         {/* Left */}
         <div className="flex items-center gap-3">
-          <Link to={ROUTES.CASHFLOW_DASHBOARD} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+          <Link
+            to={ROUTES.CASHFLOW_DASHBOARD}
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          >
             <NuvexLogo size={28} />
-            <span className="font-display font-bold text-foreground text-lg hidden sm:inline">{APP_NAME}</span>
+            <span className="font-display font-bold text-foreground text-lg hidden sm:inline">
+              {APP_NAME}
+            </span>
           </Link>
 
           {/* Desktop Nav dropdown */}
@@ -83,7 +119,12 @@ export function Header() {
             >
               <i className="bx bx-grid-alt" />
               Modules
-              <i className={cn("bx bx-chevron-down text-xs transition-transform", navOpen && "rotate-180")} />
+              <i
+                className={cn(
+                  "bx bx-chevron-down text-xs transition-transform",
+                  navOpen && "rotate-180",
+                )}
+              />
             </button>
             {navOpen && (
               <div className="absolute left-0 top-full mt-1 w-56 bg-card border border-border rounded-xl shadow-elevated py-1 animate-fade-in">
@@ -96,14 +137,23 @@ export function Header() {
                     {mod.children.map((item) => (
                       <button
                         key={item.path}
-                        onClick={() => { navigate(item.path); setNavOpen(false); }}
+                        onClick={() => {
+                          navigate(item.path);
+                          setNavOpen(false);
+                        }}
                         className={cn(
                           "w-full text-left px-3 py-2 text-sm flex items-center gap-2 hover:bg-accent transition-colors",
-                          location.pathname === item.path && "text-primary bg-accent"
+                          location.pathname === item.path &&
+                            "text-primary bg-accent",
                         )}
                       >
                         <i className={`bx ${item.icon} text-base`} />
-                        {item.label}
+                        <div className="w-full flex justify-between">
+                          <span>{item.label.split("-")[0]}</span>
+                          <span className=" text-gray-600">
+                            {item.label.split("-")[1]}
+                          </span>
+                        </div>
                       </button>
                     ))}
                   </div>
@@ -128,10 +178,13 @@ export function Header() {
                 {THEME_OPTIONS.map((opt) => (
                   <button
                     key={opt.value}
-                    onClick={() => { setTheme(opt.value as any); setThemeOpen(false); }}
+                    onClick={() => {
+                      setTheme(opt.value as any);
+                      setThemeOpen(false);
+                    }}
                     className={cn(
                       "w-full text-left px-3 py-2 text-sm flex items-center gap-2 hover:bg-accent transition-colors",
-                      theme === opt.value && "text-primary bg-accent"
+                      theme === opt.value && "text-primary bg-accent",
                     )}
                   >
                     <i className={`bx ${opt.icon}`} />
@@ -155,7 +208,9 @@ export function Header() {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-secondary transition-colors md:hidden text-muted-foreground"
           >
-            <i className={`bx ${mobileMenuOpen ? "bx-x" : "bx-menu"} text-xl`} />
+            <i
+              className={`bx ${mobileMenuOpen ? "bx-x" : "bx-menu"} text-xl`}
+            />
           </button>
         </div>
       </div>
@@ -176,7 +231,8 @@ export function Header() {
                     onClick={() => navigate(item.path)}
                     className={cn(
                       "w-full text-left px-3 py-2.5 text-sm flex items-center gap-2 rounded-lg hover:bg-accent transition-colors",
-                      location.pathname === item.path && "text-primary bg-accent"
+                      location.pathname === item.path &&
+                        "text-primary bg-accent",
                     )}
                   >
                     <i className={`bx ${item.icon}`} />
@@ -189,7 +245,8 @@ export function Header() {
               onClick={() => navigate(ROUTES.PROFILE)}
               className={cn(
                 "w-full text-left px-3 py-2.5 text-sm flex items-center gap-2 rounded-lg hover:bg-accent transition-colors",
-                location.pathname === ROUTES.PROFILE && "text-primary bg-accent"
+                location.pathname === ROUTES.PROFILE &&
+                  "text-primary bg-accent",
               )}
             >
               <i className="bx bx-user" />
