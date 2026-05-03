@@ -150,9 +150,9 @@ export function Header() {
                         <i className={`bx ${item.icon} text-base`} />
                         <div className="w-full flex justify-between">
                           <span>{item.label.split("-")[0]}</span>
-                          <span className=" text-gray-600">
-                            {item.label.split("-")[1]}
-                          </span>
+                          <span className=" text-gray-600 text-xs bg-gray-800 px-2 rounded-md bg-opacity-40 flex items-center">
+                        {item.label.split("-")[1]}
+                      </span>
                         </div>
                       </button>
                     ))}
@@ -217,7 +217,7 @@ export function Header() {
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-border bg-card animate-fade-in">
+        <div className="md:hidden border-t border-border bg-card animate-fade-in absolute w-full">
           <div className="p-3 space-y-1">
             {NAV_MODULES.map((mod) => (
               <div key={mod.label}>
@@ -236,7 +236,12 @@ export function Header() {
                     )}
                   >
                     <i className={`bx ${item.icon}`} />
-                    {item.label}
+                    <div className="w-full flex justify-between">
+                      <span>{item.label.split("-")[0]}</span>
+                      <span className=" text-gray-600 text-xs bg-gray-800 px-2 rounded-md bg-opacity-40 flex items-center">
+                        {item.label.split("-")[1]}
+                      </span>
+                    </div>
                   </button>
                 ))}
               </div>
