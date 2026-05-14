@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/common/PageHeader";
 import { SkeletonCard } from "@/components/common/Skeletons";
@@ -32,7 +32,7 @@ export default function OverallNetworth() {
     null,
   );
   const [deleting, setDeleting] = useState(false);
-
+  const tableRef = useRef<HTMLDivElement>(null);
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
@@ -47,6 +47,12 @@ export default function OverallNetworth() {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  useEffect(() => {
+  if (tableRef.current) {
+    tableRef.current.scrollLeft = tableRef.current.scrollWidth;
+  }
+}, [entries]);
 
   const handleAddToday = async () => {
     setAdding(true);
@@ -139,12 +145,16 @@ export default function OverallNetworth() {
             <i className="bx bx-pulse bx-flashing" />
             Daily Health: &nbsp;
             {formatCurrency(entries?.[0].networth - entries?.[1].networth)}
-          </div> &nbsp;
-          |
+          </div>{" "}
+          &nbsp; |
           <div className="flex items-center gap-2">
             <i className="bx bx-info-circle" />
-            Summary Information: {(entries?.[0].networth - entries?.[1].networth) === 0 ? 'No Growth': 
-            (entries?.[0].networth - entries?.[1].networth) > 0 ? 'Networth Increased' : 'Networth Decreased' }
+            Summary Information:{" "}
+            {entries?.[0].networth - entries?.[1].networth === 0
+              ? "No Growth"
+              : entries?.[0].networth - entries?.[1].networth > 0
+                ? "Networth Increased"
+                : "Networth Decreased"}
           </div>
         </div>
       ) : (
@@ -152,7 +162,7 @@ export default function OverallNetworth() {
       )}
 
       {entries.length > 0 ? (
-        <div className="bg-card border border-border rounded-xl shadow-card overflow-x-auto scroll-custom-css">
+        <div ref={tableRef} className="bg-card border border-border rounded-xl shadow-card overflow-x-auto scroll-custom-css">
           <table className="w-full text-sm min-w-[1300px]">
             <thead>
               <tr className="border-b border-border bg-secondary/50">
@@ -285,8 +295,16 @@ export default function OverallNetworth() {
                   <td className="px-2 py-2 text-center text-xs border-l border-border">
                     {formatCurrency(entry.metals?.gold?.invested ?? 0)}
                   </td>
-                  <td className="px-2 py-2 text-center text-xs border-l border-border">
-                    {formatCurrency(entry.metals?.gold?.returns ?? 0)}
+                  <td
+                    className={`px-2 py-2 text-center text-xs border-l border-border ${valComparion(
+                      +entries[idx]?.metals?.gold?.totalAmount,
+                      +entries[idx + 1]?.metals?.gold?.totalAmount || 0,
+                    )}`}
+                  >
+                    {formatCurrency(
+                      +entries[idx]?.metals?.gold?.totalAmount -
+                        +entries[idx + 1]?.metals?.gold?.totalAmount || 0,
+                    ) ?? 0}
                   </td>
                   <td className="px-2 py-2 text-center text-xs font-semibold border-l border-border">
                     {formatCurrency(entry.metals?.gold?.totalAmount ?? 0)}
@@ -300,8 +318,16 @@ export default function OverallNetworth() {
                   <td className="px-2 py-2 text-center text-xs border-l border-border">
                     {formatCurrency(entry.metals?.silver?.invested ?? 0)}
                   </td>
-                  <td className="px-2 py-2 text-center text-xs border-l border-border">
-                    {formatCurrency(entry.metals?.silver?.returns ?? 0)}
+                  <td
+                    className={`px-2 py-2 text-center text-xs border-l border-border ${valComparion(
+                      +entries[idx]?.metals?.gold?.totalAmount,
+                      +entries[idx + 1]?.metals?.gold?.totalAmount || 0,
+                    )}`}
+                  >
+                    {formatCurrency(
+                      +entries[idx]?.metals?.silver?.totalAmount -
+                        +entries[idx + 1]?.metals?.silver?.totalAmount || 0,
+                    ) ?? 0}
                   </td>
                   <td className="px-2 py-2 text-center text-xs font-semibold border-l border-border">
                     {formatCurrency(entry.metals?.silver?.totalAmount ?? 0)}
@@ -310,19 +336,21 @@ export default function OverallNetworth() {
                     const fund = entry.funds?.find((f) => f.name === fundName);
                     return (
                       <React.Fragment key={fundName}>
-                        <td className="px-2 py-2 text-center text-xs border-l border-border">
+                        <td className="px-2 py-2 text-center text-xs border-l border-border  whitespace-nowrap">
                           {fund?.units ?? "-"}
                         </td>
-                        <td className="px-2 py-2 text-center text-xs border-l border-border">
+                        <td className="px-2 py-2 text-center text-xs border-l border-border whitespace-nowrap">
                           {fund ? `${fund.percentage}%` : "-"}
                         </td>
-                        <td className="px-2 py-2 text-center text-xs border-l border-border">
+                        <td className="px-2 py-2 text-center text-xs border-l border-border whitespace-nowrap">
                           {fund ? formatCurrency(fund.invested) : "-"}
                         </td>
-                        <td className="px-2 py-2 text-center text-xs border-l border-border">
+                        <td
+                          className={`px-2 py-2 text-center text-xs border-l border-border whitespace-nowrap ${fund.returns.toString().includes("-") ? "text-red-600" : "text-green-600"}`}
+                        >
                           {fund ? formatCurrency(fund.returns) : "-"}
                         </td>
-                        <td className="px-2 py-2 text-center text-xs font-semibold border-l border-border">
+                        <td className="px-2 py-2 text-center text-xs font-semibold border-l border-border whitespace-nowrap">
                           {fund ? formatCurrency(fund.totalAmount) : "-"}
                         </td>
                       </React.Fragment>
