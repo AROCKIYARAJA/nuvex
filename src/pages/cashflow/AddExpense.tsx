@@ -1,8 +1,8 @@
-import { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useMemo, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/common/PageHeader";
-import { addExpense } from "@/services/service-api";
+import { addExpense, updateExpense } from "@/services/service-api";
 import { EXPENSE_CATEGORIES } from "@/constants/app-constants";
 import { NUM } from "@/constants/num-constants";
 import { ROUTES } from "@/constants/route-constants";
@@ -10,13 +10,28 @@ import { cn } from "@/lib/utils";
 
 export default function AddExpense() {
   const navigate = useNavigate();
-  const [name, setName] = useState("");
-  const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState("");
-  const [notes, setNotes] = useState("");
+  const location = useLocation();
+  const editTx = (location.state as any)?.editTx as
+    | { id: string; name: string; amount: number; category: string; notes?: string }
+    | undefined;
+  const isEdit = !!editTx;
+
+  const [name, setName] = useState(editTx?.name ?? "");
+  const [amount, setAmount] = useState(editTx ? String(editTx.amount) : "");
+  const [category, setCategory] = useState(editTx?.category ?? "");
+  const [notes, setNotes] = useState(editTx?.notes ?? "");
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [categorySearch, setCategorySearch] = useState("");
+
+  useEffect(() => {
+    if (editTx) {
+      setName(editTx.name);
+      setAmount(String(editTx.amount));
+      setCategory(editTx.category);
+      setNotes(editTx.notes ?? "");
+    }
+  }, [editTx?.id]);
 
   const filteredCategories = useMemo(() => {
     if (!categorySearch.trim()) return EXPENSE_CATEGORIES;
@@ -42,13 +57,20 @@ export default function AddExpense() {
     if (!validate()) return;
     setLoading(true);
     try {
-      await addExpense({ name: name.trim(), amount: parseFloat(amount), category, notes: notes.trim() });
-      toast.success("Expense added successfully!", { duration: NUM.TOAST_SUCCESS_DURATION });
-      setTimeout(() => toast.info("Dashboard balance updated", { duration: NUM.TOAST_DURATION }), 500);
-      setName(""); setAmount(""); setCategory(""); setNotes(""); setCategorySearch("");
-      setErrors({});
+      const payload = { name: name.trim(), amount: parseFloat(amount), category, notes: notes.trim() };
+      if (isEdit && editTx) {
+        await updateExpense(editTx.id, payload);
+        toast.success("Expense updated!", { duration: NUM.TOAST_SUCCESS_DURATION });
+        navigate(ROUTES.CASHFLOW_DASHBOARD);
+      } else {
+        await addExpense(payload);
+        toast.success("Expense added successfully!", { duration: NUM.TOAST_SUCCESS_DURATION });
+        setTimeout(() => toast.info("Dashboard balance updated", { duration: NUM.TOAST_DURATION }), 500);
+        setName(""); setAmount(""); setCategory(""); setNotes(""); setCategorySearch("");
+        setErrors({});
+      }
     } catch {
-      toast.error("Failed to add expense", { duration: NUM.TOAST_ERROR_DURATION });
+      toast.error(isEdit ? "Failed to update expense" : "Failed to add expense", { duration: NUM.TOAST_ERROR_DURATION });
     } finally {
       setLoading(false);
     }
@@ -57,8 +79,8 @@ export default function AddExpense() {
   return (
     <div className="max-w-2xl mx-auto animate-fade-in">
       <PageHeader
-        title="Add Expense"
-        subtitle="Track your spending"
+        title={isEdit ? "Edit Expense" : "Add Expense"}
+        subtitle={isEdit ? "Update your expense details" : "Track your spending"}
         action={<button onClick={() => navigate(ROUTES.CASHFLOW_DASHBOARD)} className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1"><i className="bx bx-arrow-back" /> Back</button>}
       />
       <form onSubmit={handleSubmit} className="bg-card border border-border rounded-xl shadow-card p-5 space-y-5">
@@ -116,7 +138,7 @@ export default function AddExpense() {
 
         <button type="submit" disabled={loading}
           className="w-full gradient-primary text-primary-foreground font-medium py-3 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2">
-          {loading ? <><i className="bx bx-loader-alt bx-spin" /> Adding...</> : <><i className="bx bx-check" /> Add Expense</>}
+          {loading ? <><i className="bx bx-loader-alt bx-spin" /> {isEdit ? "Saving..." : "Adding..."}</> : <><i className="bx bx-check" /> {isEdit ? "Save Changes" : "Add Expense"}</>}
         </button>
       </form>
     </div>

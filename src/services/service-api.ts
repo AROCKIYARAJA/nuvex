@@ -222,6 +222,18 @@ export async function addExpense(
   );
 }
 
+export async function updateExpense(
+  id: string,
+  data: Partial<Omit<Expense, "id" | "createdAt" | "updatedAt">>,
+): Promise<Expense> {
+  return normalize(
+    await request<Expense>(`/expenses/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+  );
+}
+
 export async function deleteExpense(id: string): Promise<void> {
   await request<void>(`/expenses/${id}`, { method: "DELETE" });
 }
@@ -242,6 +254,18 @@ export async function addIncome(
   );
 }
 
+export async function updateIncome(
+  id: string,
+  data: Partial<Omit<Income, "id" | "createdAt" | "updatedAt">>,
+): Promise<Income> {
+  return normalize(
+    await request<Income>(`/incomes/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+  );
+}
+
 export async function deleteIncome(id: string): Promise<void> {
   await request<void>(`/incomes/${id}`, { method: "DELETE" });
 }
@@ -257,6 +281,18 @@ export async function addMetal(
   return normalize(
     await request<MetalEntry>("/metals", {
       method: "POST",
+      body: JSON.stringify(data),
+    }),
+  );
+}
+
+export async function updateMetal(
+  id: string,
+  data: Partial<Omit<MetalEntry, "id" | "createdAt" | "updatedAt">>,
+): Promise<MetalEntry> {
+  return normalize(
+    await request<MetalEntry>(`/metals/${id}`, {
+      method: "PUT",
       body: JSON.stringify(data),
     }),
   );

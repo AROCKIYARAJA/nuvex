@@ -8,6 +8,7 @@ import { SkeletonCard } from "@/components/common/Skeletons";
 import {
   getMetals,
   addMetal,
+  updateMetal,
   deleteMetal,
   withdrawAsset,
   updateMetalAssets,
@@ -44,6 +45,7 @@ export default function BullionVault() {
     purchaseDate: "",
     notes: "",
   });
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const [withdrawOpen, setWithdrawOpen] = useState(false);
@@ -90,7 +92,20 @@ export default function BullionVault() {
 
   const openModal = (type: "gold" | "silver") => {
     setMetalType(type);
+    setEditingId(null);
     setForm({ quantity: "", buyingPrice: "", purchaseDate: "", notes: "" });
+    setModalOpen(true);
+  };
+
+  const openEditModal = (m: MetalEntry) => {
+    setMetalType(m.type);
+    setEditingId(m.id);
+    setForm({
+      quantity: String(m.quantity),
+      buyingPrice: String(m.buyingPrice),
+      purchaseDate: m.purchaseDate ? String(m.purchaseDate).slice(0, 10) : "",
+      notes: m.notes || "",
+    });
     setModalOpen(true);
   };
 
@@ -111,20 +126,29 @@ export default function BullionVault() {
     }
     setSubmitting(true);
     try {
-      await addMetal({
+      const payload = {
         type: metalType,
         quantity: qty,
         buyingPrice: price,
         purchaseDate: form.purchaseDate,
         notes: form.notes,
-      });
-      toast.success(`${metalType === "gold" ? "Gold" : "Silver"} added!`, {
-        duration: NUM.TOAST_DURATION,
-      });
+      };
+      if (editingId) {
+        await updateMetal(editingId, payload);
+        toast.success(`${metalType === "gold" ? "Gold" : "Silver"} updated!`, {
+          duration: NUM.TOAST_DURATION,
+        });
+      } else {
+        await addMetal(payload);
+        toast.success(`${metalType === "gold" ? "Gold" : "Silver"} added!`, {
+          duration: NUM.TOAST_DURATION,
+        });
+      }
       setModalOpen(false);
+      setEditingId(null);
       loadData();
     } catch {
-      toast.error("Failed to add");
+      toast.error(editingId ? "Failed to update" : "Failed to add");
     } finally {
       setSubmitting(false);
     }
@@ -365,7 +389,15 @@ export default function BullionVault() {
                 {formatCurrency(m.quantity * m.buyingPrice)}
               </span>
               <button
+                onClick={() => openEditModal(m)}
+                title="Edit"
+                className="w-8 h-8 rounded-lg hover:bg-primary/10 flex items-center justify-center text-muted-foreground hover:text-primary transition-colors"
+              >
+                <i className="bx bx-edit text-lg" />
+              </button>
+              <button
                 onClick={() => handleDelete(m.id)}
+                title="Delete"
                 className="w-8 h-8 rounded-lg hover:bg-destructive/10 flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors"
               >
                 <i className="bx bx-trash text-lg" />
@@ -384,8 +416,8 @@ export default function BullionVault() {
       {/* Add Modal */}
       <Modal
         open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        title={`Add ${metalType === "gold" ? "Gold" : "Silver"}`}
+        onClose={() => { setModalOpen(false); setEditingId(null); }}
+        title={`${editingId ? "Edit" : "Add"} ${metalType === "gold" ? "Gold" : "Silver"}`}
       >
         <div className="space-y-4">
           <div>
@@ -448,12 +480,11 @@ export default function BullionVault() {
           >
             {submitting ? (
               <>
-                <i className="bx bx-loader-alt bx-spin" /> Adding...
+                <i className="bx bx-loader-alt bx-spin" /> {editingId ? "Saving..." : "Adding..."}
               </>
             ) : (
               <>
-                <i className="bx bx-check" /> Add{" "}
-                {metalType === "gold" ? "Gold" : "Silver"}
+                <i className="bx bx-check" /> {editingId ? "Save Changes" : `Add ${metalType === "gold" ? "Gold" : "Silver"}`}
               </>
             )}
           </button>

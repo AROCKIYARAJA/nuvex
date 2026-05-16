@@ -151,8 +151,8 @@ export function Header() {
                         <div className="w-full flex justify-between">
                           <span>{item.label.split("-")[0]}</span>
                           <span className=" text-gray-600 text-xs bg-gray-800 px-2 rounded-md bg-opacity-40 flex items-center">
-                        {item.label.split("-")[1]}
-                      </span>
+                            {item.label.split("-")[1]}
+                          </span>
                         </div>
                       </button>
                     ))}
@@ -238,9 +238,6 @@ export function Header() {
                     <i className={`bx ${item.icon}`} />
                     <div className="w-full flex justify-between">
                       <span>{item.label.split("-")[0]}</span>
-                      <span className=" text-gray-600 text-xs bg-gray-800 px-2 rounded-md bg-opacity-40 flex items-center">
-                        {item.label.split("-")[1]}
-                      </span>
                     </div>
                   </button>
                 ))}

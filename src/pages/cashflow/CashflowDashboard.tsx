@@ -11,6 +11,8 @@ import {
   getIncomes,
   getTopSpending,
   getRecentTransactions,
+  deleteExpense,
+  deleteIncome,
   type Expense,
   type Income,
   type TopSpendingItem,
@@ -70,6 +72,33 @@ export default function CashflowDashboard() {
   const [transLimit, setTransLimit] = useState(5);
   const [recentTransactions, setRecentTransactions] = useState([]);
   const [chartPeriod, setChartPeriod] = useState("monthly");
+  const [pendingDelete, setPendingDelete] = useState<{ id: string; type: "income" | "expense"; name: string } | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleEditTx = (tx: any) => {
+    const editTx = { id: tx.id, name: tx.name, amount: tx.amount, category: tx.category, notes: tx.notes ?? "" };
+    if (tx.type === "expense") {
+      navigate(ROUTES.CASHFLOW_ADD_EXPENSE, { state: { editTx } });
+    } else {
+      navigate(ROUTES.CASHFLOW_ADD_INCOME, { state: { editTx } });
+    }
+  };
+
+  const confirmDeleteTx = async () => {
+    if (!pendingDelete) return;
+    setDeleting(true);
+    try {
+      if (pendingDelete.type === "expense") await deleteExpense(pendingDelete.id);
+      else await deleteIncome(pendingDelete.id);
+      toast.success("Transaction deleted");
+      setPendingDelete(null);
+      await loadData();
+    } catch {
+      toast.error("Failed to delete");
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -453,6 +482,22 @@ export default function CashflowDashboard() {
                     {tx.type === "expense" ? "-" : "+"}
                     {formatCurrency(tx.amount, currency)}
                   </span>
+                  <div className="flex items-center gap-1 ml-2">
+                    <button
+                      onClick={() => handleEditTx(tx)}
+                      title="Edit"
+                      className="w-8 h-8 rounded-lg hover:bg-primary/10 flex items-center justify-center text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      <i className="bx bx-edit text-lg" />
+                    </button>
+                    <button
+                      onClick={() => setPendingDelete({ id: tx.id, type: tx.type, name: tx.name })}
+                      title="Delete"
+                      className="w-8 h-8 rounded-lg hover:bg-destructive/10 flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors"
+                    >
+                      <i className="bx bx-trash text-lg" />
+                    </button>
+                  </div>
                 </div>
               );
             })}
@@ -465,6 +510,38 @@ export default function CashflowDashboard() {
           />
         )}
       </div>
+
+      {pendingDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => !deleting && setPendingDelete(null)}>
+          <div onClick={(e) => e.stopPropagation()} className="bg-card border border-border rounded-xl shadow-xl max-w-sm w-full p-5 space-y-4 animate-fade-in">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-destructive/10 text-destructive flex items-center justify-center text-xl">
+                <i className="bx bx-trash" />
+              </div>
+              <div>
+                <h3 className="font-display font-semibold text-foreground">Delete transaction?</h3>
+                <p className="text-xs text-muted-foreground">This will permanently delete "{pendingDelete.name}".</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setPendingDelete(null)}
+                disabled={deleting}
+                className="flex-1 bg-secondary text-secondary-foreground font-medium py-2.5 rounded-lg border border-border hover:bg-muted transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDeleteTx}
+                disabled={deleting}
+                className="flex-1 bg-destructive text-destructive-foreground font-medium py-2.5 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {deleting ? <><i className="bx bx-loader-alt bx-spin" /> Deleting...</> : <><i className="bx bx-trash" /> Delete</>}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

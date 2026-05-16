@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/common/PageHeader";
-import { addIncome } from "@/services/service-api";
+import { addIncome, updateIncome } from "@/services/service-api";
 import { INCOME_CATEGORIES } from "@/constants/app-constants";
 import { NUM } from "@/constants/num-constants";
 import { ROUTES } from "@/constants/route-constants";
@@ -10,12 +10,27 @@ import { cn } from "@/lib/utils";
 
 export default function AddIncome() {
   const navigate = useNavigate();
-  const [name, setName] = useState("");
-  const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState("");
-  const [notes, setNotes] = useState("");
+  const location = useLocation();
+  const editTx = (location.state as any)?.editTx as
+    | { id: string; name: string; amount: number; category: string; notes?: string }
+    | undefined;
+  const isEdit = !!editTx;
+
+  const [name, setName] = useState(editTx?.name ?? "");
+  const [amount, setAmount] = useState(editTx ? String(editTx.amount) : "");
+  const [category, setCategory] = useState(editTx?.category ?? "");
+  const [notes, setNotes] = useState(editTx?.notes ?? "");
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (editTx) {
+      setName(editTx.name);
+      setAmount(String(editTx.amount));
+      setCategory(editTx.category);
+      setNotes(editTx.notes ?? "");
+    }
+  }, [editTx?.id]);
 
   const validate = () => {
     const errs: Record<string, string> = {};
@@ -38,27 +53,36 @@ export default function AddIncome() {
     if (!validate()) return;
     setLoading(true);
     try {
-      await addIncome({
+      const payload = {
         name: name.trim(),
         amount: parseFloat(amount),
         category,
         notes: notes.trim(),
-      });
-      toast.success("Income added successfully!", {
-        duration: NUM.TOAST_SUCCESS_DURATION,
-      });
-      setTimeout(
-        () =>
-          toast.info("Money status updated", { duration: NUM.TOAST_DURATION }),
-        500,
-      );
-      setName("");
-      setAmount("");
-      setCategory("");
-      setNotes("");
-      setErrors({});
+      };
+      if (isEdit && editTx) {
+        await updateIncome(editTx.id, payload);
+        toast.success("Income updated!", {
+          duration: NUM.TOAST_SUCCESS_DURATION,
+        });
+        navigate(ROUTES.CASHFLOW_DASHBOARD);
+      } else {
+        await addIncome(payload);
+        toast.success("Income added successfully!", {
+          duration: NUM.TOAST_SUCCESS_DURATION,
+        });
+        setTimeout(
+          () =>
+            toast.info("Money status updated", { duration: NUM.TOAST_DURATION }),
+          500,
+        );
+        setName("");
+        setAmount("");
+        setCategory("");
+        setNotes("");
+        setErrors({});
+      }
     } catch {
-      toast.error("Failed to add income", {
+      toast.error(isEdit ? "Failed to update income" : "Failed to add income", {
         duration: NUM.TOAST_ERROR_DURATION,
       });
     } finally {
@@ -69,8 +93,8 @@ export default function AddIncome() {
   return (
     <div className="max-w-2xl mx-auto animate-fade-in">
       <PageHeader
-        title="Add Income"
-        subtitle="Record your earnings"
+        title={isEdit ? "Edit Income" : "Add Income"}
+        subtitle={isEdit ? "Update your income details" : "Record your earnings"}
         action={
           <button
             onClick={() => navigate(ROUTES.CASHFLOW_DASHBOARD)}
@@ -168,11 +192,11 @@ export default function AddIncome() {
         >
           {loading ? (
             <>
-              <i className="bx bx-loader-alt bx-spin" /> Adding...
+              <i className="bx bx-loader-alt bx-spin" /> {isEdit ? "Saving..." : "Adding..."}
             </>
           ) : (
             <>
-              <i className="bx bx-plus" /> Add Income
+              <i className="bx bx-plus" /> {isEdit ? "Save Changes" : "Add Income"}
             </>
           )}
         </button>
