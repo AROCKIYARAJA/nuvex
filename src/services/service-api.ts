@@ -1,4 +1,3 @@
-
 // ============= Types =============
 export interface UserProfile {
   id: string;
@@ -329,7 +328,7 @@ export async function updateMetalAssets(data: {
   pricePerGram: number;
 }): Promise<any> {
   return await request<any>("/metals/update-price", {
-    method: "PUT",
+    method: "POST",
     body: JSON.stringify(data),
   });
 }
