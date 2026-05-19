@@ -12,7 +12,13 @@ export default function AddIncome() {
   const navigate = useNavigate();
   const location = useLocation();
   const editTx = (location.state as any)?.editTx as
-    | { id: string; name: string; amount: number; category: string; notes?: string }
+    | {
+        id: string;
+        name: string;
+        amount: number;
+        category: string;
+        notes?: string;
+      }
     | undefined;
   const isEdit = !!editTx;
 
@@ -21,6 +27,7 @@ export default function AddIncome() {
   const [category, setCategory] = useState(editTx?.category ?? "");
   const [notes, setNotes] = useState(editTx?.notes ?? "");
   const [loading, setLoading] = useState(false);
+  const [autoNavigation, setAutoNavigation] = useState(true);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -64,7 +71,6 @@ export default function AddIncome() {
         toast.success("Income updated!", {
           duration: NUM.TOAST_SUCCESS_DURATION,
         });
-        navigate(ROUTES.CASHFLOW_DASHBOARD);
       } else {
         await addIncome(payload);
         toast.success("Income added successfully!", {
@@ -72,7 +78,9 @@ export default function AddIncome() {
         });
         setTimeout(
           () =>
-            toast.info("Money status updated", { duration: NUM.TOAST_DURATION }),
+            toast.info("Money status updated", {
+              duration: NUM.TOAST_DURATION,
+            }),
           500,
         );
         setName("");
@@ -80,6 +88,10 @@ export default function AddIncome() {
         setCategory("");
         setNotes("");
         setErrors({});
+        if (autoNavigation === true) {
+          setAutoNavigation(false);
+          navigate(ROUTES.CASHFLOW_DASHBOARD);
+        }
       }
     } catch {
       toast.error(isEdit ? "Failed to update income" : "Failed to add income", {
@@ -94,7 +106,9 @@ export default function AddIncome() {
     <div className="max-w-2xl mx-auto animate-fade-in">
       <PageHeader
         title={isEdit ? "Edit Income" : "Add Income"}
-        subtitle={isEdit ? "Update your income details" : "Record your earnings"}
+        subtitle={
+          isEdit ? "Update your income details" : "Record your earnings"
+        }
         action={
           <button
             onClick={() => navigate(ROUTES.CASHFLOW_DASHBOARD)}
@@ -104,6 +118,21 @@ export default function AddIncome() {
           </button>
         }
       />
+      <div className="flex gap-2 items-center my-2">
+        <input
+          type="checkbox"
+          name="auto-navigation"
+          id="auto-navigation"
+          checked={autoNavigation}
+          onChange={(e) => setAutoNavigation((v) => !v)}
+        />
+        <label
+          className="block text-sm font-medium text-foreground mb-1.5"
+          htmlFor="auto-navigation"
+        >
+          After the data entry redirect me to main page automatically
+        </label>
+      </div>
       <form
         onSubmit={handleSubmit}
         className="bg-card border border-border rounded-xl shadow-card p-5 space-y-5"
@@ -192,11 +221,13 @@ export default function AddIncome() {
         >
           {loading ? (
             <>
-              <i className="bx bx-loader-alt bx-spin" /> {isEdit ? "Saving..." : "Adding..."}
+              <i className="bx bx-loader-alt bx-spin" />{" "}
+              {isEdit ? "Saving..." : "Adding..."}
             </>
           ) : (
             <>
-              <i className="bx bx-plus" /> {isEdit ? "Save Changes" : "Add Income"}
+              <i className="bx bx-plus" />{" "}
+              {isEdit ? "Save Changes" : "Add Income"}
             </>
           )}
         </button>
