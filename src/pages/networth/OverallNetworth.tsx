@@ -49,10 +49,10 @@ export default function OverallNetworth() {
   }, [loadData]);
 
   useEffect(() => {
-  if (tableRef.current) {
-    tableRef.current.scrollLeft = tableRef.current.scrollWidth;
-  }
-}, [entries]);
+    if (tableRef.current) {
+      tableRef.current.scrollLeft = tableRef.current.scrollWidth;
+    }
+  }, [entries]);
 
   const handleAddToday = async () => {
     setAdding(true);
@@ -162,7 +162,10 @@ export default function OverallNetworth() {
       )}
 
       {entries.length > 0 ? (
-        <div ref={tableRef} className="bg-card border border-border rounded-xl shadow-card overflow-x-auto scroll-custom-css">
+        <div
+          ref={tableRef}
+          className="bg-card border border-border rounded-xl shadow-card overflow-x-auto scroll-custom-css"
+        >
           <table className="w-full text-sm min-w-[1300px]">
             <thead>
               <tr className="border-b border-border bg-secondary/50">
@@ -286,17 +289,17 @@ export default function OverallNetworth() {
                       </button>
                     </div>
                   </td>
-                  <td className="px-2 py-2 text-center text-xs border-l border-border">
+                  <td className="px-2 py-2 text-center text-xs border-l border-border whitespace-nowrap">
                     {entry.metals?.gold?.grams ?? 0}g
                   </td>
-                  <td className="px-2 py-2 text-center text-xs border-l border-border">
+                  <td className="px-2 py-2 text-center text-xs border-l border-border whitespace-nowrap">
                     {entry.metals?.gold?.percentage ?? 0}%
                   </td>
-                  <td className="px-2 py-2 text-center text-xs border-l border-border">
+                  <td className="px-2 py-2 text-center text-xs border-l border-border whitespace-nowrap">
                     {formatCurrency(entry.metals?.gold?.invested ?? 0)}
                   </td>
                   <td
-                    className={`px-2 py-2 text-center text-xs border-l border-border ${valComparion(
+                    className={`px-2 py-2 text-center text-xs border-l border-border whitespace-nowrap ${valComparion(
                       +entries[idx]?.metals?.gold?.totalAmount,
                       +entries[idx + 1]?.metals?.gold?.totalAmount || 0,
                     )}`}
@@ -306,20 +309,20 @@ export default function OverallNetworth() {
                         +entries[idx + 1]?.metals?.gold?.totalAmount || 0,
                     ) ?? 0}
                   </td>
-                  <td className="px-2 py-2 text-center text-xs font-semibold border-l border-border">
+                  <td className="px-2 py-2 text-center text-xs font-semibold border-l border-border whitespace-nowrap">
                     {formatCurrency(entry.metals?.gold?.totalAmount ?? 0)}
                   </td>
-                  <td className="px-2 py-2 text-center text-xs border-l border-border">
+                  <td className="px-2 py-2 text-center text-xs border-l border-border whitespace-nowrap">
                     {entry.metals?.silver?.grams ?? 0}g
                   </td>
-                  <td className="px-2 py-2 text-center text-xs border-l border-border">
+                  <td className="px-2 py-2 text-center text-xs border-l border-border whitespace-nowrap">
                     {entry.metals?.silver?.percentage ?? 0}%
                   </td>
-                  <td className="px-2 py-2 text-center text-xs border-l border-border">
+                  <td className="px-2 py-2 text-center text-xs border-l border-border whitespace-nowrap">
                     {formatCurrency(entry.metals?.silver?.invested ?? 0)}
                   </td>
                   <td
-                    className={`px-2 py-2 text-center text-xs border-l border-border ${valComparion(
+                    className={`px-2 py-2 text-center text-xs border-l border-border whitespace-nowrap ${valComparion(
                       +entries[idx]?.metals?.gold?.totalAmount,
                       +entries[idx + 1]?.metals?.gold?.totalAmount || 0,
                     )}`}
@@ -329,7 +332,7 @@ export default function OverallNetworth() {
                         +entries[idx + 1]?.metals?.silver?.totalAmount || 0,
                     ) ?? 0}
                   </td>
-                  <td className="px-2 py-2 text-center text-xs font-semibold border-l border-border">
+                  <td className="px-2 py-2 text-center text-xs font-semibold border-l border-border whitespace-nowrap">
                     {formatCurrency(entry.metals?.silver?.totalAmount ?? 0)}
                   </td>
                   {allFundNames.map((fundName) => {
@@ -356,20 +359,20 @@ export default function OverallNetworth() {
                       </React.Fragment>
                     );
                   })}
-                  <td className="px-2 py-2 text-center text-xs border-l border-border">
+                  <td className="px-2 py-2 text-center text-xs border-l border-border whitespace-nowrap">
                     {formatCurrency(entry.bankLiquidity ?? 0)}
                   </td>
-                  <td className="px-2 py-2 text-center text-xs border-l border-border">
+                  <td className="px-2 py-2 text-center text-xs border-l border-border whitespace-nowrap">
                     {formatCurrency(entry.pfAmount ?? 0)}
                   </td>
                   <td
-                    className={`px-2 py-2 text-center text-xs font-bold border-l border-border ${valComparion(entries[idx].networth, entries[idx + 1]?.networth || 0)}`}
+                    className={`px-2 py-2 text-center text-xs font-bold border-l border-border whitespace-nowrap ${valComparion(entries[idx].networth, entries[idx + 1]?.networth || 0)}`}
                   >
                     {formatCurrency(entry.networth ?? 0)}
                   </td>
                   <td
                     className={cn(
-                      "px-2 py-2 text-center text-xs font-semibold border-l border-border",
+                      "px-2 py-2 text-center text-xs font-semibold border-l border-border whitespace-nowrap",
                       (entries[idx].networth - entries[idx + 1]?.networth || 0)
                         .toString()
                         .includes("-")
