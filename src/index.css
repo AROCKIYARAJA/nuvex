@@ -183,12 +183,12 @@ body::-webkit-scrollbar,
   width: var(--sb-size);
 }
 
-body::-webkit-scrollbar-track {
+body::-webkit-scrollbar-track, .scroll-custom-css::-webkit-scrollbar {
   background: var(--sb-track-color);
   border-radius: 5px;
 }
 
-body::-webkit-scrollbar-thumb {
+body::-webkit-scrollbar-thumb, .scroll-custom-css::-webkit-scrollbar {
   background: var(--sb-thumb-color);
   border-radius: 5px;
 }

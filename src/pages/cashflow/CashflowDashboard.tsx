@@ -443,7 +443,7 @@ export default function CashflowDashboard() {
           </select>
         </div>
         {recentTransactions?.length > 0 ? (
-          <div className="divide-y divide-border">
+          <div className="divide-y divide-border h-96 scroll-custom-css overflow-y-auto ">
             {recentTransactions.map((tx) => {
               const cats =
                 tx.type === "expense" ? EXPENSE_CATEGORIES : INCOME_CATEGORIES;
